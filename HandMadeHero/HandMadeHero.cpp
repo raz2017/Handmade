@@ -2,29 +2,114 @@
 //
 
 #include "HandMadeHero.h"
-#include "windows.h"    
+#include "windows.h"
 
-void foo() {
-    OutputDebugStringA("Hello World\n");
-
-}
-
-int CALLBACK  WinMain( HINSTANCE hInstance,
-                      HINSTANCE hPrevInstance,
-                      LPSTR    lpCmdLine,
-                      int       nCmdShow)
+LRESULT CALLBACK MainWindowCallBack(
+	HWND Window,
+	UINT Message,
+	WPARAM WParam,
+	LPARAM LParam
+)
 {
+	LRESULT Result = 0;
 
-    // TODO: Place code here.
+	switch (Message)
+	{
+	case WM_SIZE:
+		{
+			OutputDebugStringA("WM_SIZE\n");
+		}
+		break;
 
-    foo();  
+	case WM_DESTROY:
+		{
+			OutputDebugStringA("WM_DESTROY\n");
+		}
+		break;
 
-    int x = 0;
-    x += 1;
+	case WM_CLOSE:
+		{
+			OutputDebugStringA("WM_CLOSE\n");
+		}
+		break;
 
-    
+	case WM_ACTIVATEAPP:
+		{
+			OutputDebugStringA("WM_ACTIVATEAPP\n");
+		}
+		break;
 
+	case WM_PAINT:
+		{
+			PAINTSTRUCT Paint;
+			HDC DeviceContext = BeginPaint(Window, &Paint);
+			int X = Paint.rcPaint.left;
+			int Y = Paint.rcPaint.top;
+			int Height = Paint.rcPaint.bottom - Paint.rcPaint.top;
+			int Width = Paint.rcPaint.right - Paint.rcPaint.left;
+
+			PatBlt(DeviceContext, X, Y, Width, Height, WHITENESS);
+			EndPaint(Window, &Paint);
+		}
+		break;
+
+	default:
+		{
+			Result = DefWindowProc(Window, Message, WParam, LParam);
+		}
+		break;
+	}
+	return (Result);
 }
 
+int CALLBACK WinMain(HINSTANCE Instance,
+                     HINSTANCE PrevInstance,
+                     LPSTR CommandLine,
+                     int ShowCode)
+{
+	WNDCLASS WindowClass = {};
 
+	WindowClass.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
+	WindowClass.lpfnWndProc = MainWindowCallBack;
+	WindowClass.hInstance = Instance;
+	WindowClass.lpszClassName = L"HandmadeHeroWindowClass";
 
+	if (RegisterClass(&WindowClass))
+	{
+		HWND WindowHandle = CreateWindowEx(
+			0,
+			WindowClass.lpszClassName,
+			L"Handmade Hero",
+			WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			0,
+			0,
+			Instance,
+			0);
+
+		if (WindowHandle)
+		{
+			MSG Message;
+			for (;;)
+			{
+				BOOL MessageResult = GetMessage(&Message, 0, 0, 0);
+				if (MessageResult > 0)
+				{
+					TranslateMessage(&Message);
+					DispatchMessage(&Message);
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+	}
+	else
+	{
+	}
+	return (0);
+};
