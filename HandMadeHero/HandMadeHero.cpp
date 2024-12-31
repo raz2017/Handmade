@@ -508,6 +508,7 @@ int CALLBACK WinMain(HINSTANCE Instance,
 						{
 
 							real32 SineValue;
+
 							int16 SampleValue = (RunningSampleIndex / (HalfWavePeriod) ) %2 ? ToneVolume : -ToneVolume;
 
 							*SampleOut++ = SampleValue;
