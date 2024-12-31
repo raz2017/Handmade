@@ -6,6 +6,7 @@
 #include "stdint.h"
 #include "xinput.h"
 #include "dsound.h"
+#include "math.h"
 
 #define internal static
 
@@ -20,6 +21,8 @@ using int32 = int32_t;
 using int64 = int64_t;
 
 typedef int32 bool32;
+typedef float real32 ;
+typedef double real64 ;
 
 struct win32_offscreen_buffer{
 	BITMAPINFO Info;
@@ -392,8 +395,8 @@ int CALLBACK WinMain(HINSTANCE Instance,
 			int ToneHz = 256;
 			int16 ToneVolume = 16000;
 			uint32 RunningSampleIndex = 0;
-			int SquareWavePeriod = SamplesPerSecond / ToneHz;
-			int HalfSquareWavePeriod = SquareWavePeriod / 2;
+			int WavePeriod = SamplesPerSecond / ToneHz;
+			int HalfWavePeriod = WavePeriod / 2;
 			int BytesPerSample = sizeof(int16) * 2;
 			int SecondaryBufferSize = SamplesPerSecond * BytesPerSample;
 
@@ -503,7 +506,9 @@ int CALLBACK WinMain(HINSTANCE Instance,
 
 						for (DWORD SampleIndex =  0; SampleIndex < Region1SampleCount; ++SampleIndex)
 						{
-							int16 SampleValue = (RunningSampleIndex / (HalfSquareWavePeriod) ) %2 ? ToneVolume : -ToneVolume;
+
+							real32 SineValue 
+							int16 SampleValue = (RunningSampleIndex / (HalfWavePeriod) ) %2 ? ToneVolume : -ToneVolume;
 
 							*SampleOut++ = SampleValue;
 							*SampleOut++ = SampleValue;
@@ -516,7 +521,7 @@ int CALLBACK WinMain(HINSTANCE Instance,
 						SampleOut = (int16*)Region2;
 						for (DWORD SampleIndex = 0; SampleIndex < Region2SampleCount; ++SampleIndex)
 						{
-							int16 SampleValue = (RunningSampleIndex / (HalfSquareWavePeriod)) % 2 ? ToneVolume : -ToneVolume;
+							int16 SampleValue = (RunningSampleIndex / (HalfWavePeriod)) % 2 ? ToneVolume : -ToneVolume;
 
 							*SampleOut++ = SampleValue;
 							*SampleOut++ = SampleValue;

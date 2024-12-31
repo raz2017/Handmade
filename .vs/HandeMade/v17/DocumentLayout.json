@@ -22,11 +22,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:149568096:0:{83107a3e-496a-485e-b455-16ddb978e55e}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "HandMadeHero.cpp",
+              "DocumentMoniker": "W:\\Hero\\HandMadeHero\\HandMadeHero.cpp",
+              "RelativeDocumentMoniker": "HandMadeHero\\HandMadeHero.cpp",
+              "ToolTip": "W:\\Hero\\HandMadeHero\\HandMadeHero.cpp",
+              "RelativeToolTip": "HandMadeHero\\HandMadeHero.cpp",
+              "ViewState": "AQIAAOMBAAAAAAAAAAAAAO4BAAATAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-08-01T03:26:04.574Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -39,19 +52,6 @@
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2024-08-01T04:03:03.324Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "HandMadeHero.cpp",
-              "DocumentMoniker": "W:\\Hero\\HandMadeHero\\HandMadeHero.cpp",
-              "RelativeDocumentMoniker": "HandMadeHero\\HandMadeHero.cpp",
-              "ToolTip": "W:\\Hero\\HandMadeHero\\HandMadeHero.cpp",
-              "RelativeToolTip": "HandMadeHero\\HandMadeHero.cpp",
-              "ViewState": "AQIAAAYAAAAAAAAAAAAAACIAAAACAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-08-01T03:26:04.574Z",
-              "EditorCaption": ""
             },
             {
               "$type": "Document",

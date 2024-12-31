@@ -1,2 +1,3 @@
 ﻿  HandMadeHero.cpp
+W:\Hero\HandMadeHero\HandMadeHero.cpp(260,17): warning C4244: 'initializing': conversion from 'WPARAM' to 'uint32', possible loss of data
   HandMadeHero.vcxproj -> W:\Hero\x64\Debug\HandMadeHero.exe
