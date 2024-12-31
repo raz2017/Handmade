@@ -31,6 +31,6 @@
 *.out
 *.app
 
-.vs*
-*x64*
-build*
+.vs/
+**x64**
+**build*
