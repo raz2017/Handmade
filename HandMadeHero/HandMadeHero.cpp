@@ -565,8 +565,6 @@ int CALLBACK WinMain(HINSTANCE Instance,
 
 				wind32_window_dimension Dimension = Win32GetWindowDimension(Window);
 				Win32DisplayBufferWindow(DeviceContext, Dimension.Width, Dimension.Height, &GlobalBackbuffer);
-				++XOffset;
-				//YOffset += 2;
 			}
 
 		}
