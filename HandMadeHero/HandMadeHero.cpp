@@ -435,6 +435,10 @@ int CALLBACK WinMain(HINSTANCE Instance,
                      LPSTR CommandLine,
                      int ShowCode)
 {
+	LARGE_INTEGER PerfCountFrequencyResult;
+	QueryPerformanceFrequency(&PerfCountFrequencyResult);
+	int64 PerfCountFrequency = PerfCountFrequencyResult.QuadPart;
+	int64 LastCycleCount = __rdtsc();
 	Win32LoadXInput();
 
 	WNDCLASS WindowClass = {};
@@ -445,6 +449,7 @@ int CALLBACK WinMain(HINSTANCE Instance,
 	WindowClass.lpfnWndProc = WIN32MainWindowCallBack;
 	WindowClass.hInstance = Instance;
 	WindowClass.lpszClassName = L"HandmadeHeroWindowClass";
+
 
 	if (RegisterClass(&WindowClass))
 	{
@@ -483,9 +488,11 @@ int CALLBACK WinMain(HINSTANCE Instance,
 
 			GlobalRunning = true;
 
+			LARGE_INTEGER BeginCounter;
+			QueryPerformanceCounter(&BeginCounter);
+
 			while (GlobalRunning)
 			{
-
 				MSG Message;
 				while ( PeekMessage(&Message, 0, 0, 0, PM_REMOVE))
 				{
@@ -565,6 +572,23 @@ int CALLBACK WinMain(HINSTANCE Instance,
 
 				wind32_window_dimension Dimension = Win32GetWindowDimension(Window);
 				Win32DisplayBufferWindow(DeviceContext, Dimension.Width, Dimension.Height, &GlobalBackbuffer);
+
+				
+				int64 EndCycleCount = __rdtsc();
+
+				LARGE_INTEGER EndCounter;
+				QueryPerformanceCounter(&EndCounter);
+
+				int64 CyclesElapsed = EndCycleCount - LastCycleCount;
+				int64 CounterElapsed = EndCounter.QuadPart - BeginCounter.QuadPart;
+				int32 MSPerFrame =(int32)((1000 * CounterElapsed) / PerfCountFrequency);
+				int32 FPS =  PerfCountFrequency / CounterElapsed;
+				int32 MCPF = (int32)(CyclesElapsed / (1000 * 1000));
+				char Buffer[256];
+				wsprintfA(Buffer, "%dms/f,   %df/s,  %dmc/f\n", MSPerFrame, FPS, MCPF);
+				OutputDebugStringA(Buffer);
+				BeginCounter = EndCounter;
+				LastCycleCount = EndCycleCount;
 			}
 
 		}
