@@ -15,12 +15,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HandMadeHero.h">
+    <ClInclude Include="win64_handmadehero.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="handmade.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="HandMadeHero.cpp">
+    <ClCompile Include="win64_handmadehero.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="handmade.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

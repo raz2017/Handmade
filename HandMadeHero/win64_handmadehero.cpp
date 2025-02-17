@@ -1,29 +1,32 @@
 // HandMadeHero.cpp : Defines the entry point for the application.
 //
 
-#include "HandMadeHero.h"
+#include "win64_handmadehero.h"
 #include "windows.h"
-#include "stdint.h"
 #include "xinput.h"
 #include "dsound.h"
 #include "math.h"
+#include "stdio.h"
+#include "stdint.h"
 
 #define internal static
 #define Pi32 3.14159265359f
 
-using uint8 = uint8_t;
-using uint16 = uint16_t;
-using uint32 = uint32_t;
-using uint64 = uint64_t;
+typedef uint8_t uint8;
+typedef uint16_t uint16;
+typedef uint32_t uint32;
+typedef uint64_t uint64;
 
-using int8 = int8_t;
-using int16 = int16_t;
-using int32 = int32_t;
-using int64 = int64_t;
+typedef int8_t int8;
+typedef int16_t int16;
+typedef int32_t int32;
+typedef int64_t int64;
 
 typedef int32 bool32;
 typedef float real32 ;
 typedef double real64 ;
+
+#include "handmade.cpp"
 
 struct win32_offscreen_buffer{
 	BITMAPINFO Info;
@@ -34,7 +37,7 @@ struct win32_offscreen_buffer{
 };
 
 static bool GlobalRunning;
-static win32_offscreen_buffer GlobalBackbuffer;
+static win32_offscreen_buffer GlobalBackBuffer;
 static LPDIRECTSOUNDBUFFER GlobalSecondaryBuffer;
 
 struct wind32_window_dimension
@@ -42,6 +45,7 @@ struct wind32_window_dimension
 	int Width;
 	int Height;
 };
+
 
 #define X_INPUT_GET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex, XINPUT_STATE *pState)
 typedef X_INPUT_GET_STATE(x_input_get_state);
@@ -66,6 +70,11 @@ static x_input_set_state *XInputSetState_ = XInputSetStateStub;
 
 #define DIRECT_SOUND_CREATE(name) HRESULT WINAPI name(LPCGUID pcGuidDevice, LPDIRECTSOUND *ppDS, LPUNKNOWN pUnkOuter)
 typedef DIRECT_SOUND_CREATE(direct_sound_create);
+
+void* PlatformLoadFile(const char* FileName)
+{
+	return nullptr;
+}
 
 
 internal void
@@ -174,23 +183,6 @@ Win32GetWindowDimension(HWND Window)
 	return Result;
 }
 
-internal void RenderWeirdGrandient(win32_offscreen_buffer *Buffer, int BlueOffset, int GreenOffset)
-{
-	uint8* Row = (uint8*)Buffer->Memory;
-	for (int Y = 0; Y < Buffer->Height; ++Y)
-	{
-		uint32* Pixel = (uint32*)Row;
-		for (int X = 0; X < Buffer->Width; ++X)
-		{
-			uint8 Blue = (X + BlueOffset);
-			uint8 Green = (Y + GreenOffset);
-
-			*Pixel++ = ((Green << 8) | Blue);
-		}
-
-		Row += Buffer->Pitch;
-	}
-}
 
 
 void WIN32ResizeDIBSection(win32_offscreen_buffer *Buffer, int Width, int Height)
@@ -239,7 +231,7 @@ LRESULT CALLBACK WIN32MainWindowCallBack(
 	case WM_SIZE:
 		{
 			wind32_window_dimension Dimension = Win32GetWindowDimension(Window);
-			WIN32ResizeDIBSection(&GlobalBackbuffer, Dimension.Width, Dimension.Height);
+			WIN32ResizeDIBSection(&GlobalBackBuffer, Dimension.Width, Dimension.Height);
 			OutputDebugStringA("WM_SIZE\n");
 		}
 		break;
@@ -347,7 +339,7 @@ LRESULT CALLBACK WIN32MainWindowCallBack(
 			int Width = Paint.rcPaint.right - Paint.rcPaint.left;
 
 			wind32_window_dimension Dimension = Win32GetWindowDimension(Window);
-			Win32DisplayBufferWindow(DeviceContext, Dimension.Width, Dimension.Height, &GlobalBackbuffer);
+			Win32DisplayBufferWindow(DeviceContext, Dimension.Width, Dimension.Height, &GlobalBackBuffer);
 			EndPaint(Window, &Paint);
 		}
 		break;
@@ -438,12 +430,12 @@ int CALLBACK WinMain(HINSTANCE Instance,
 	LARGE_INTEGER PerfCountFrequencyResult;
 	QueryPerformanceFrequency(&PerfCountFrequencyResult);
 	int64 PerfCountFrequency = PerfCountFrequencyResult.QuadPart;
-	int64 LastCycleCount = __rdtsc();
+	uint64 LastCycleCount = __rdtsc();
 	Win32LoadXInput();
 
 	WNDCLASS WindowClass = {};
 
-	WIN32ResizeDIBSection(&GlobalBackbuffer, 1280, 720);
+	WIN32ResizeDIBSection(&GlobalBackBuffer, 1280, 720);
 
 	WindowClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 	WindowClass.lpfnWndProc = WIN32MainWindowCallBack;
@@ -545,8 +537,14 @@ int CALLBACK WinMain(HINSTANCE Instance,
 				// Vibration.wLeftMotorSpeed = 60000;
 				// Vibration.wRightMotorSpeed = 60000;
 				// XInputSetState(0, &Vibration);
+				
+				game_offscreen_buffer Buffer = {};
+				Buffer.Memory = GlobalBackBuffer.Memory;
+				Buffer.Width = GlobalBackBuffer.Width;
+				Buffer.Height = GlobalBackBuffer.Height;
+				Buffer.Pitch = GlobalBackBuffer.Pitch ;
 
-				RenderWeirdGrandient(&GlobalBackbuffer, XOffset, YOffset);
+				GameUpdateAndRender(&Buffer, XOffset, YOffset);
 
 				DWORD PlayCursor;
 				DWORD WriteCursor ;
@@ -571,22 +569,26 @@ int CALLBACK WinMain(HINSTANCE Instance,
 				}
 
 				wind32_window_dimension Dimension = Win32GetWindowDimension(Window);
-				Win32DisplayBufferWindow(DeviceContext, Dimension.Width, Dimension.Height, &GlobalBackbuffer);
+				Win32DisplayBufferWindow(DeviceContext, Dimension.Width, Dimension.Height, &GlobalBackBuffer);
 
 				
-				int64 EndCycleCount = __rdtsc();
+				uint64 EndCycleCount = __rdtsc();
 
 				LARGE_INTEGER EndCounter;
 				QueryPerformanceCounter(&EndCounter);
-
-				int64 CyclesElapsed = EndCycleCount - LastCycleCount;
+				
+				uint64 CyclesElapsed = EndCycleCount - LastCycleCount;
 				int64 CounterElapsed = EndCounter.QuadPart - BeginCounter.QuadPart;
-				int32 MSPerFrame =(int32)((1000 * CounterElapsed) / PerfCountFrequency);
-				int32 FPS =  PerfCountFrequency / CounterElapsed;
-				int32 MCPF = (int32)(CyclesElapsed / (1000 * 1000));
+				real64 MSPerFrame =(((1000.0f *(real64)CounterElapsed) / (real64)PerfCountFrequency));
+				real64 FPS = (real64) PerfCountFrequency / (real64)CounterElapsed;
+				real64 MCPF = ((real64)CyclesElapsed / (1000.0f * 1000.0f));
+				
+				#if 0
 				char Buffer[256];
-				wsprintfA(Buffer, "%dms/f,   %df/s,  %dmc/f\n", MSPerFrame, FPS, MCPF);
+				sprintf_s(Buffer, "%.02fms/f,   %.02ff/s,  %.02fmc/f\n", MSPerFrame, FPS, MCPF);
 				OutputDebugStringA(Buffer);
+				#endif
+
 				BeginCounter = EndCounter;
 				LastCycleCount = EndCycleCount;
 			}

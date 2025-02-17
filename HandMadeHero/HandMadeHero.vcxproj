@@ -127,10 +127,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="HandMadeHero.h" />
+    <ClInclude Include="handmade.h" />
+    <ClInclude Include="win64_handmadehero.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="HandMadeHero.cpp" />
+    <ClCompile Include="handmade.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64_handmadehero.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HandMadeHero.rc" />
